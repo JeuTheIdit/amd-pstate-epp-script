@@ -91,7 +91,7 @@ else
 fi
 
 # Check bootloader
-if bootctl is-installed; then
+if bootctl is-installed >/dev/null 2>&1; then
     BOOTLOADER="systemd-boot"
     print_info "Detected bootloader: $BOOTLOADER"
 elif [[ -d /boot/grub || -d /boot/grub2 ]]; then
