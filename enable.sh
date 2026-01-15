@@ -44,9 +44,9 @@ SCALING_DRIVER_FILE="/sys/devices/system/cpu/cpu0/cpufreq/scaling_driver"
 KERNEL_PARAM="amd_pstate=active"
 
 # Ask the user for scaling governor setting
-print_info "Select scaling governor:"
-print_info "  1) performance"
-print_info "  2) powersave"
+echo -e "Select scaling governor:"
+echo -e "  1) performance"
+echo -e "  2) powersave"
 printf "Enter choice [1-2] (default 1): "
 read -r gov_choice
 gov_choice=${gov_choice:-1} # default to 1 if empty
@@ -59,11 +59,11 @@ esac
 
 # Ask the user for EPP setting
 echo
-print_info "Select energy performance preference (EPP) hint:"
-print_info "  1) performance"
-print_info "  2) balance_performance"
-print_info "  3) balance_power"
-print_info "  4) power"
+echo -e "Select energy performance preference (EPP) hint:"
+echo -e "  1) performance"
+echo -e "  2) balance_performance"
+echo -e "  3) balance_power"
+echo -e "  4) power"
 printf "Enter choice [1-4] (default 1): "
 read -r epp_choice
 epp_choice=${epp_choice:-1} # default to 1 if empty
@@ -78,9 +78,9 @@ esac
 
 # Show seleted settings
 echo
-print_info "Chosen settings:"
-print_info "  Scaling governor: $GOVERNOR"
-print_info "  EPP hint        : $EPP"
+echo -e "Chosen settings:"
+echo -e "  Scaling governor: $GOVERNOR"
+echo -e "  EPP hint        : $EPP"
 
 # Confirm before continuing
 printf "Continue with these settings? (y/N): "
@@ -89,8 +89,8 @@ confirm=${confirm:-N}                    # N if nothing typed
 if [[ ${confirm,,} =~ ^y ]]; then        # if starts with y (case‑insensitive)
     print_info "Proceeding..."
 else
-    print_error "Aborted."
-    exit 0
+    print_error "Exiting"
+    exit 1
 fi
 
 # Check bootloader
