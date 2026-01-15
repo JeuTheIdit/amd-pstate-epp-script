@@ -47,8 +47,7 @@ KERNEL_PARAM="amd_pstate=active"
 echo -e "Select scaling governor:"
 echo -e "  1) performance"
 echo -e "  2) powersave"
-printf "Enter choice [1-2] (default 1): "
-read -r gov_choice
+read -p "Enter choice [1-2] (default 1): " -r gov_choice
 gov_choice=${gov_choice:-1} # default to 1 if empty
 
 case "$gov_choice" in
@@ -64,8 +63,7 @@ echo -e "  1) performance"
 echo -e "  2) balance_performance"
 echo -e "  3) balance_power"
 echo -e "  4) power"
-printf "Enter choice [1-4] (default 1): "
-read -r epp_choice
+read -p "Enter choice [1-4] (default 1): " -r epp_choice
 epp_choice=${epp_choice:-1} # default to 1 if empty
 
 case "$epp_choice" in
@@ -83,8 +81,7 @@ echo -e "  Scaling governor: $GOVERNOR"
 echo -e "  EPP hint        : $EPP"
 
 # Confirm before continuing
-printf "Continue with these settings? (y/N): "
-read -r confirm
+read -p "Continue with these settings? (y/N): " -r confirm
 confirm=${confirm:-N}                    # N if nothing typed
 if [[ ${confirm,,} =~ ^y ]]; then        # if starts with y (case‑insensitive)
     print_info "Proceeding..."
@@ -109,7 +106,7 @@ fi
 if [[ -f "$SCALING_DRIVER_FILE" ]]; then
     SCALING_DRIVER=$(<"$SCALING_DRIVER_FILE")
     if [[ "$SCALING_DRIVER" == "amd-pstate-epp" ]]; then
-        print_warn "Current scaling driver is already '$SCALING_DRIVER' - Skipping adding kernel parameter `amd_pstate=active`"
+        print_warn "Current scaling driver is already '$SCALING_DRIVER' - Skipping adding kernel parameter `$KERNEL_PARAM`"
     else
         print_info "Current scaling driver is '$SCALING_DRIVER' - Adding kernel parameter $KERNEL_PARAM"
         if [[ "$BOOTLOADER" == "GRUB" ]]; then
@@ -120,7 +117,7 @@ if [[ -f "$SCALING_DRIVER_FILE" ]]; then
                 for entry in /boot/loader/entries/*.conf; do
                     sed -i "/^options / s/$/ $KERNEL_PARAM/" "$entry"
                 done
-                print_info "$KERNEL_PARAM added to systemd-boot entries"
+                print_info "$KERNEL_PARAM added to $BOOTLOADER entries"
             fi
         else
             if grep -q "$KERNEL_PARAM" /etc/default/grub; then
@@ -131,7 +128,7 @@ if [[ -f "$SCALING_DRIVER_FILE" ]]; then
                     "s/^\(GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*\)\"/\1 $KERNEL_PARAM\"/" \
                     /etc/default/grub
                 update-grub
-                print_info "$KERNEL_PARAM added and GRUB updated"
+                print_info "$KERNEL_PARAM added and $BOOTLOADER updated"
             fi
         fi
     fi
