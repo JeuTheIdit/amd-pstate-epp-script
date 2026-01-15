@@ -12,6 +12,23 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Messages
+print_error() {
+    echo -e "${RED}[ERROR] $1${NC}" >&2
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS] $1${NC}"
+}
+
+print_info() {
+    echo -e "${YELLOW}[INFO] $1${NC}"
+}
+
+print_warn() {
+    echo -e "${YELLOW}[WARN] $1${NC}"
+}
+
 # Parse flags
 while getopts ":g:e:" opt; do
   case "$opt" in
