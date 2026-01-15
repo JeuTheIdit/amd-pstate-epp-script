@@ -85,6 +85,7 @@ read -p "Continue with these settings? (y/N): " -r confirm
 confirm=${confirm:-N}                    # N if nothing typed
 if [[ ${confirm,,} =~ ^y ]]; then        # if starts with y (case‑insensitive)
     print_info "Proceeding..."
+    echo -e DEBUG 1
 else
     print_error "Exiting"
     exit 1
@@ -96,7 +97,9 @@ if bootctl is-installed 2>/dev/null; then
     print_info "Detected bootloader: $BOOTLOADER"
 elif [[ -d /boot/grub || -d /boot/grub2 ]]; then
     BOOTLOADER="GRUB"
+    echo -e DEBUG 2
     print_info "Detected bootloader: $BOOTLOADER"
+    echo -e DEBUG 3
 else
     print_error "No supported bootloader detected - Exiting"
     exit 1
