@@ -82,12 +82,17 @@ echo -e "  EPP hint        : $EPP"
 
 # Confirm before continuing
 read -p "Continue with these settings? (y/N): " -r confirm
-confirm=${confirm:-N}                    # N if nothing typed
-if [[ ${confirm,,} =~ ^y ]]; then        # if starts with y (case‑insensitive)
+echo "DEBUG: Raw input = '$confirm'"
+confirm=${confirm:-N}
+echo "DEBUG: After default = '$confirm'"
+echo "DEBUG: Lowercase = '${confirm,,}'"
+echo "DEBUG: Regex match result: $([[ ${confirm,,} =~ ^y ]] && echo 'MATCH' || echo 'NO MATCH')"
+if [[ ${confirm,,} =~ ^y ]]; then
     print_info "Proceeding..."
     echo -e "DEBUG 1"
 else
     print_error "Exiting"
+    echo -e "DEBUG 2"  # This line will execute
     exit 1
 fi
 
