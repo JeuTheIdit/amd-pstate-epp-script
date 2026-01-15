@@ -38,8 +38,10 @@ check_root() {
 }
 
 # DEFAULTS
-governor="performance"
-epp="performance"
+GOVERNOR="performance"
+EPP="performance"
+SCALING_DRIVER_FILE="/sys/devices/system/cpu/cpu0/cpufreq/scaling_driver"
+KERNEL_PARAM="amd_pstate=active"
 
 # Ask the user for scaling governor setting
 print_info "Select scaling governor:"
@@ -50,8 +52,8 @@ read -r gov_choice
 gov_choice=${gov_choice:-1} # default to 1 if empty
 
 case "$gov_choice" in
-    1) governor="performance" ;;
-    2) governor="powersave" ;;
+    1) GOVERNOR="performance" ;;
+    2) GOVERNOR="powersave" ;;
     *) print_warn "Unrecognised choice – Defaulting to 'performance'" ;;
 esac
 
@@ -67,18 +69,18 @@ read -r epp_choice
 epp_choice=${epp_choice:-1} # default to 1 if empty
 
 case "$epp_choice" in
-    1) epp="performance" ;;
-    2) epp="balance_performance" ;;
-    3) epp="balance_power" ;;
-    4) epp="power" ;;
+    1) EPP="performance" ;;
+    2) EPP="balance_performance" ;;
+    3) EPP="balance_power" ;;
+    4) EPP="power" ;;
     *) print_warn "Unrecognised choice – Defaulting to 'performance'" ;;
 esac
 
 # Show seleted settings
 echo
 print_info "Chosen settings:"
-print_info "  Scaling governor: $governor"
-print_info "  EPP hint        : $epp"
+print_info "  Scaling governor: $GOVERNOR"
+print_info "  EPP hint        : $EPP"
 
 # Confirm before continuing
 printf "Continue with these settings? (y/N): "
@@ -90,3 +92,51 @@ else
     print_error "Aborted."
     exit 0
 fi
+
+# Check bootloader
+if bootctl is-installed 2>/dev/null; then
+    BOOTLOADER="systemd-boot"
+    print_info "Detected bootloader: $BOOTLOADER"
+elif [[ -d /boot/grub || -d /boot/grub2 ]]; then
+    BOOTLOADER="GRUB"
+    print_info "Detected bootloader: $BOOTLOADER"
+else
+    print_error "No supported bootloader detected - Exiting"
+    exit 1
+fi
+
+# Check if amd-pstate-epp is already enabled and enable if not
+if [[ -f "$SCALING_DRIVER_FILE" ]]; then
+    SCALING_DRIVER=$(<"$SCALING_DRIVER_FILE")
+    if [[ "$SCALING_DRIVER" == "amd-pstate-epp" ]]; then
+        print_warn "Current scaling driver is already '$SCALING_DRIVER' - Skipping adding kernel parameter `amd_pstate=active`"
+    else
+        print_info "Current scaling driver is '$SCALING_DRIVER' - Adding kernel parameter $KERNEL_PARAM"
+        if [[ "$BOOTLOADER" == "GRUB" ]]; then
+            if grep -R "$KERNEL_PARAM" /boot/loader/entries/*.conf >/dev/null 2>&1; then
+                print_error "$KERNEL_PARAM already set but current driver is $SCALING_DRIVER - Check that CPPC is enabled in BIOS"
+                exit 1
+            else
+                for entry in /boot/loader/entries/*.conf; do
+                    sed -i "/^options / s/$/ $KERNEL_PARAM/" "$entry"
+                done
+                print_info "$KERNEL_PARAM added to systemd-boot entries"
+            fi
+        else
+            if grep -q "$KERNEL_PARAM" /etc/default/grub; then
+                print_error "$KERNEL_PARAM already set but current driver is $SCALING_DRIVER - Check that CPPC is enabled in BIOS"
+                exit 1
+            else
+                sed -i \
+                    "s/^\(GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*\)\"/\1 $KERNEL_PARAM\"/" \
+                    /etc/default/grub
+                update-grub
+                print_info "$KERNEL_PARAM added and GRUB updated"
+            fi
+        fi
+    fi
+else
+    print_error "Scaling driver file not found — CPU frequency scaling may not be enabled"
+    exit 1
+fi
+
