@@ -109,7 +109,7 @@ if [[ -f "$SCALING_DRIVER_FILE" ]]; then
         print_warn "Current scaling driver is already '$SCALING_DRIVER' - Skipping adding kernel parameter `$KERNEL_PARAM`"
     else
         print_info "Current scaling driver is '$SCALING_DRIVER' - Adding kernel parameter $KERNEL_PARAM"
-        if [[ "$BOOTLOADER" == "GRUB" ]]; then
+        if [[ "$BOOTLOADER" == "systemd-boot" ]]; then
             if grep -R "$KERNEL_PARAM" /boot/loader/entries/*.conf >/dev/null 2>&1; then
                 print_error "$KERNEL_PARAM already set but current driver is $SCALING_DRIVER - Check that CPPC is enabled in BIOS"
                 exit 1
