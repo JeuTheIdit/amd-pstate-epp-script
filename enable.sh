@@ -29,24 +29,64 @@ print_warn() {
     echo -e "${YELLOW}[WARN] $1${NC}"
 }
 
-# Parse flags
-while getopts ":g:e:" opt; do
-  case "$opt" in
-    g)  flag_g=$OPTARG   ;;
-    e)  flag_e=$OPTARG   ;;
-    \?) echo "❌ Unknown option: -$OPTARG" >&2; exit 1 ;;
-    :)  echo "❌ Option -$OPTARG requires an argument" >&2; exit 1 ;;
-  esac
-done
-shift $((OPTIND - 1))  # Drop the options from $@
-
-# Configuration
-GOVERNOR="${flag_a:-<none>}"
-EPP="${flag_b:-<none>}"
-
+# Check for root
 check_root() {
     if [[ $EUID -ne 0 ]]; then
         print_error "This script must be run as root"
         exit 1
     fi
 }
+
+# DEFAULTS
+governor="performance"
+epp="performance"
+
+# Ask the user for governor setting
+echo "Select CPU governor:"
+echo "  1) performance"
+echo "  2) power"
+printf "Enter choice [1-2] (default 1): "
+read -r gov_choice
+gov_choice=${gov_choice:-1} # default to 1 if empty
+
+case "$gov_choice" in
+    1) governor="performance" ;;
+    2) governor="power" ;;
+    *) echo "⚠️  Unrecognised choice – defaulting to 'performance'" ;;
+esac
+
+# Ask the user for EPP setting
+echo
+echo "Select Energy Performance Preference (EPP):"
+echo "  1) performance"
+echo "  2) balance_performance"
+echo "  3) balance_power"
+echo "  4) power"
+printf "Enter choice [1-4] (default 1): "
+read -r epp_choice
+epp_choice=${epp_choice:-1} # default to 1 if empty
+
+case "$epp_choice" in
+    1) epp="performance" ;;
+    2) epp="balance_performance" ;;
+    3) epp="balance_power" ;;
+    4) epp="power" ;;
+    *) echo "⚠️  Unrecognised choice – defaulting to 'performance'" ;;
+esac
+
+# Show seleted settings
+echo
+echo "Chosen settings:"
+echo "  Governor: $governor"
+echo "  EPP     : $epp"
+
+# Confirm before continuing
+printf "Continue with these settings? (y/N): "
+read -r confirm
+confirm=${confirm:-N}                    # N if nothing typed
+if [[ ${confirm,,} =~ ^y ]]; then        # if starts with y (case‑insensitive)
+    echo "Proceeding..."
+else
+    echo "Aborted."
+    exit 0
+fi
