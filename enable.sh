@@ -26,7 +26,7 @@ print_info() {
 }
 
 print_warn() {
-    echo -e "${YELLOW}[WARN] $1${NC}"
+    echo -e "${YELLOW}[WARN] $1${NC}" >&2
 }
 
 # Check for root
