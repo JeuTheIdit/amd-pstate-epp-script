@@ -106,7 +106,7 @@ fi
 if [[ -f "$SCALING_DRIVER_FILE" ]]; then
     SCALING_DRIVER=$(<"$SCALING_DRIVER_FILE")
     if [[ "$SCALING_DRIVER" == "amd-pstate-epp" ]]; then
-        print_warn "Current scaling driver is already '$SCALING_DRIVER' - Skipping adding kernel parameter `$KERNEL_PARAM`"
+        print_warn "Current scaling driver is already $SCALING_DRIVER - Skipping adding kernel parameter $KERNEL_PARAM"
     else
         print_info "Current scaling driver is '$SCALING_DRIVER' - Adding kernel parameter $KERNEL_PARAM"
         if [[ "$BOOTLOADER" == "systemd-boot" ]]; then
