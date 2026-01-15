@@ -26,3 +26,10 @@ shift $((OPTIND - 1))  # Drop the options from $@
 # Configuration
 GOVERNOR="${flag_a:-<none>}"
 EPP="${flag_b:-<none>}"
+
+check_root() {
+    if [[ $EUID -ne 0 ]]; then
+        print_error "This script must be run as root"
+        exit 1
+    fi
+}
