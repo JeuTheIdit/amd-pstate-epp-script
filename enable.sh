@@ -47,13 +47,13 @@ KERNEL_PARAM="amd_pstate=active"
 echo -e "Select scaling governor:"
 echo -e "  1) performance"
 echo -e "  2) powersave"
-read -p "Enter choice [1-2] (default 1): " -r gov_choice
-gov_choice=${gov_choice:-1} # default to 1 if empty
+read -p "Enter choice [1-2] (default 1): " -r GOV_CHOICE
+GOV_CHOICE=${GOV_CHOICE:-1} # default to 1 if empty
 
-case "$gov_choice" in
+case "$GOV_CHOICE" in
     1) GOVERNOR="performance" ;;
     2) GOVERNOR="powersave" ;;
-    *) print_warn "Unrecognised choice – Defaulting to 'performance'" ;;
+    *) print_warn "Unrecognised choice – Defaulting to '$GOVERNOR'" ;;
 esac
 
 # Ask the user for EPP setting
@@ -63,15 +63,15 @@ echo -e "  1) performance"
 echo -e "  2) balance_performance"
 echo -e "  3) balance_power"
 echo -e "  4) power"
-read -p "Enter choice [1-4] (default 1): " -r epp_choice
-epp_choice=${epp_choice:-1} # default to 1 if empty
+read -p "Enter choice [1-4] (default 1): " -r EPP_CHOICE
+EPP_CHOICE=${EPP_CHOICE:-1} # default to 1 if empty
 
-case "$epp_choice" in
+case "$EPP_CHOICE" in
     1) EPP="performance" ;;
     2) EPP="balance_performance" ;;
     3) EPP="balance_power" ;;
     4) EPP="power" ;;
-    *) print_warn "Unrecognised choice – Defaulting to 'performance'" ;;
+    *) print_warn "Unrecognised choice – Defaulting to '$EPP'" ;;
 esac
 
 # Show seleted settings
@@ -81,30 +81,22 @@ echo -e "  Scaling governor: $GOVERNOR"
 echo -e "  EPP hint        : $EPP"
 
 # Confirm before continuing
-read -p "Continue with these settings? (y/N): " -r confirm
-echo "DEBUG: Raw input = '$confirm'"
-confirm=${confirm:-N}
-echo "DEBUG: After default = '$confirm'"
-echo "DEBUG: Lowercase = '${confirm,,}'"
-echo "DEBUG: Regex match result: $([[ ${confirm,,} =~ ^y ]] && echo 'MATCH' || echo 'NO MATCH')"
-if [[ ${confirm,,} =~ ^y ]]; then
+read -p "Continue with these settings? (y/N): " -r CONFIRM
+CONFIRM=${CONFIRM:-N}
+if [[ ${CONFIRM,,} =~ ^y ]]; then
     print_info "Proceeding..."
-    echo -e "DEBUG 1"
 else
     print_error "Exiting"
-    echo -e "DEBUG 2"  # This line will execute
     exit 1
 fi
 
 # Check bootloader
-if bootctl is-installed 2>/dev/null; then
+if bootctl is-installed; then
     BOOTLOADER="systemd-boot"
     print_info "Detected bootloader: $BOOTLOADER"
 elif [[ -d /boot/grub || -d /boot/grub2 ]]; then
     BOOTLOADER="GRUB"
-    echo -e "DEBUG 2"
     print_info "Detected bootloader: $BOOTLOADER"
-    echo -e "DEBUG 3"
 else
     print_error "No supported bootloader detected - Exiting"
     exit 1
