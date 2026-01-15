@@ -10,4 +10,5 @@ Documentation:
 
 ## Usage
 
-
+## Confirmation:
+Confirm the `amd-pstate-epp` driver is active with `cpupower frequency-info`.
