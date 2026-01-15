@@ -22,7 +22,7 @@ print_success() {
 }
 
 print_info() {
-    echo -e "${YELLOW}[INFO] $1${NC}"
+    echo -e "${BLUE}[INFO] $1${NC}"
 }
 
 print_warn() {
@@ -42,9 +42,9 @@ governor="performance"
 epp="performance"
 
 # Ask the user for governor setting
-echo "Select CPU governor:"
-echo "  1) performance"
-echo "  2) power"
+print_info "Select CPU governor:"
+print_info "  1) performance"
+print_info "  2) power"
 printf "Enter choice [1-2] (default 1): "
 read -r gov_choice
 gov_choice=${gov_choice:-1} # default to 1 if empty
@@ -52,16 +52,16 @@ gov_choice=${gov_choice:-1} # default to 1 if empty
 case "$gov_choice" in
     1) governor="performance" ;;
     2) governor="power" ;;
-    *) echo "⚠️  Unrecognised choice – defaulting to 'performance'" ;;
+    *) print_warn "Unrecognised choice – defaulting to 'performance'" ;;
 esac
 
 # Ask the user for EPP setting
 echo
-echo "Select Energy Performance Preference (EPP):"
-echo "  1) performance"
-echo "  2) balance_performance"
-echo "  3) balance_power"
-echo "  4) power"
+print_info "Select Energy Performance Preference (EPP):"
+print_info "  1) performance"
+print_info "  2) balance_performance"
+print_info "  3) balance_power"
+print_info "  4) power"
 printf "Enter choice [1-4] (default 1): "
 read -r epp_choice
 epp_choice=${epp_choice:-1} # default to 1 if empty
@@ -71,22 +71,22 @@ case "$epp_choice" in
     2) epp="balance_performance" ;;
     3) epp="balance_power" ;;
     4) epp="power" ;;
-    *) echo "⚠️  Unrecognised choice – defaulting to 'performance'" ;;
+    *) print_warn "Unrecognised choice – defaulting to 'performance'" ;;
 esac
 
 # Show seleted settings
 echo
-echo "Chosen settings:"
-echo "  Governor: $governor"
-echo "  EPP     : $epp"
+print_info "Chosen settings:"
+print_info "  Governor: $governor"
+print_info "  EPP     : $epp"
 
 # Confirm before continuing
 printf "Continue with these settings? (y/N): "
 read -r confirm
 confirm=${confirm:-N}                    # N if nothing typed
 if [[ ${confirm,,} =~ ^y ]]; then        # if starts with y (case‑insensitive)
-    echo "Proceeding..."
+    print_info "Proceeding..."
 else
-    echo "Aborted."
+    print_error "Aborted."
     exit 0
 fi
