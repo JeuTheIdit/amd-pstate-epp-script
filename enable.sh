@@ -41,23 +41,23 @@ check_root() {
 governor="performance"
 epp="performance"
 
-# Ask the user for governor setting
-print_info "Select CPU governor:"
+# Ask the user for scaling governor setting
+print_info "Select scaling governor:"
 print_info "  1) performance"
-print_info "  2) power"
+print_info "  2) powersave"
 printf "Enter choice [1-2] (default 1): "
 read -r gov_choice
 gov_choice=${gov_choice:-1} # default to 1 if empty
 
 case "$gov_choice" in
     1) governor="performance" ;;
-    2) governor="power" ;;
-    *) print_warn "Unrecognised choice – defaulting to 'performance'" ;;
+    2) governor="powersave" ;;
+    *) print_warn "Unrecognised choice – Defaulting to 'performance'" ;;
 esac
 
 # Ask the user for EPP setting
 echo
-print_info "Select Energy Performance Preference (EPP):"
+print_info "Select energy performance preference (EPP) hint:"
 print_info "  1) performance"
 print_info "  2) balance_performance"
 print_info "  3) balance_power"
@@ -71,14 +71,14 @@ case "$epp_choice" in
     2) epp="balance_performance" ;;
     3) epp="balance_power" ;;
     4) epp="power" ;;
-    *) print_warn "Unrecognised choice – defaulting to 'performance'" ;;
+    *) print_warn "Unrecognised choice – Defaulting to 'performance'" ;;
 esac
 
 # Show seleted settings
 echo
 print_info "Chosen settings:"
-print_info "  Governor: $governor"
-print_info "  EPP     : $epp"
+print_info "  Scaling governor: $governor"
+print_info "  EPP hint        : $epp"
 
 # Confirm before continuing
 printf "Continue with these settings? (y/N): "
